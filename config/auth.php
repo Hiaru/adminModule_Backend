@@ -40,6 +40,20 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        /**
+         * GUARD FOR REGULAR USERS
+         */
+        'user' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+
+        'api' => [
+            'driver' => 'token',
+            'provider' => 'users', // This is the change i made default was users and i don't have users provider
+            'hash' => false,
+        ],
     ],
 
     /*

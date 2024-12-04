@@ -22,9 +22,11 @@ use App\Http\Controllers\usersDatabasesController;
 */
 Route::post('login', [loginController::class, 'login']);
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::post('new', [loginController::class, 'test']);
 
-    Route::post('/get_all_users_with_roles', [managerController::class, 'get_all_users_with_roles']);
+Route::middleware(['auth:sanctum'])->group(function () {
+
+    Route::post('get_all_users_with_roles', [managerController::class, 'all_users_with_roles']);
 
     Route::post('/get_roles_by_user', [managerController::class, 'get_roles_by_user']);
 
@@ -34,9 +36,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/update_user_status', [managerController::class, 'update_user_status']);
 
-    Route::get('/get_all_roles', [managerController::class, 'get_all_roles']);
+    Route::post('/get_all_roles', [managerController::class, 'get_all_roles']);
 
-    Route::get('/get_all_permissions', [managerController::class, 'get_all_permissions']);
+    Route::post('/get_all_permissions', [managerController::class, 'get_all_permissions']);
 
     Route::get('/logout', [loginController::class, 'logout']);
 

@@ -10,6 +10,8 @@ use Spatie\Permission\Models\Permission;
 use App\Models\Roles\rm_userModel as rm_user;
 use App\Models\Databases\users_databasesModel as users_databases;
 
+use function PHPUnit\Framework\empty;
+
 class managerService {
 
     /**
@@ -19,7 +21,7 @@ class managerService {
      */
     public function get_all_users_with_roles($database_id){
         /**
-         * CHECK ID
+         * CHECK DATABASE ID
          */
         if($database_id === null || $database_id === '' || $database_id === false){
             return response()->json([
@@ -32,6 +34,16 @@ class managerService {
          * GET DATABASE MODEL
          */
         $model = users_databases::where('id', $database_id)->get('model')->first();
+
+        /**
+         * CHECK IF DATABASE EXISTS
+         */
+        if(empty($model)){
+            return response()->json([
+                'status' => false,
+                'errorTitle' => 'Base de datos no encontrada'
+            ], 400);
+        }
 
         /**
          * GET ALL USER WITH HIS ROLES
@@ -59,11 +71,11 @@ class managerService {
     /**
      * GET ROLES BY USER
      */
-    public function get_roles_by_user($id, $database_id){
+    public function get_roles_by_user($user_id, $database_id){
         /**
          * CHECK ID
          */
-        if($id === null || $id === '' || $id === false){
+        if($user_id === null || $user_id === '' || $user_id === false){
             return response()->json([
                 'status' => false,
                 'errorTitle' => 'El id del usuario es requerido'
@@ -71,24 +83,57 @@ class managerService {
         }
 
         /**
-         * GET USER
+         * CHECK DATABASE ID
          */
-        $user = rm_user::on('risk_matrix')->find($id);
-
-        /**
-         * CHECK USER
-         */
-        if(!$user){
+        if($database_id === null || $database_id === '' || $database_id === false){
             return response()->json([
                 'status' => false,
-                'errorTitle' => 'Usuario no encontrado'
+                'errorTitle' => 'El id de la base de datos a seleccionar es requerido'
             ], 400);
         }
 
         /**
-         * GET DATA
+         * GET DATABASE MODEL
          */
-        $role_names = $user->get_roles_by_user($user->id);
+        $model = users_databases::where('id', $database_id)->get('model')->first();
+
+        /**
+         * CHECK IF DATABASE EXISTS
+         */
+        if(empty($model)){
+            return response()->json([
+                'status' => false,
+                'errorTitle' => 'Base de datos no encontrada'
+            ], 400);
+        }
+
+        switch ($model->model) {
+            case 'rm_userModel':
+                /**
+                 * GET USER
+                 */
+                $user = rm_user::on('risk_matrix')->find($user_id);
+
+                /**
+                 * CHECK USER
+                 */
+                if(!$user){
+                    return response()->json([
+                        'status' => false,
+                        'errorTitle' => 'Usuario no encontrado'
+                    ], 400);
+                }
+
+                /**
+                 * GET DATA
+                 */
+                $role_names = $user->get_roles_by_user($user->id);
+            break;
+
+            default:
+                # code...
+            break;
+        }
 
         /**
          * RETURN RESPONSE
@@ -103,11 +148,11 @@ class managerService {
     /**
      * GET ALL PERMISSIONS BY USER
      */
-    public function get_permissions_by_user($id){
+    public function get_permissions_by_user($user_id, $database_id){
         /**
          * CHECK ID
          */
-        if($id === null || $id === '' || $id === false){
+        if($user_id === null || $user_id === '' || $user_id === false){
             return response()->json([
                 'status' => false,
                 'errorTitle' => 'El id del usuario es requerido'
@@ -115,24 +160,67 @@ class managerService {
         }
 
         /**
-         * GET USER
+         * CHECK DATABASE ID
          */
-        $user = rm_user::on('risk_matrix')->find($id); // Replace $userId with the actual user ID
-
-        /**
-         * CHECK USER
-         */
-        if(!$user){
+        if($database_id === null || $database_id === '' || $database_id === false){
             return response()->json([
                 'status' => false,
-                'errorTitle' => 'Usuario no encontrado'
+                'errorTitle' => 'El id de la base de datos a seleccionar es requerido'
             ], 400);
         }
 
         /**
-         * GET DATA
+         * GET DATABASE MODEL
          */
-        $permissions = $user->get_permissions_by_user($user->id);
+        $model = users_databases::where('id', $database_id)->get('model')->first();
+
+        /**
+         * CHECK IF DATABASE EXISTS
+         */
+        if(empty($model)){
+            return response()->json([
+                'status' => false,
+                'errorTitle' => 'Base de datos no encontrada'
+            ], 400);
+        }
+
+        /**
+         * CHECK IF DATABASE EXISTS
+         */
+        if(empty($model)){
+            return response()->json([
+                'status' => false,
+                'errorTitle' => 'Base de datos no encontrada'
+            ], 400);
+        }
+
+        switch ($model->model) {
+            case 'rm_userModel':
+                /**
+                 * GET USER
+                 */
+                $user = rm_user::on('risk_matrix')->find($user_id); // Replace $userId with the actual user ID
+
+                /**
+                 * CHECK USER
+                 */
+                if(!$user){
+                    return response()->json([
+                        'status' => false,
+                        'errorTitle' => 'Usuario no encontrado'
+                    ], 400);
+                }
+
+                /**
+                 * GET DATA
+                 */
+                $permissions = $user->get_permissions_by_user($user->id);
+            break;
+
+            default:
+                # code...
+            break;
+        }
 
         /**
          * RETURN RESPONSE
@@ -147,14 +235,24 @@ class managerService {
     /**
      * UPDATE USER ROLES
      */
-    public function update_roles_by_user($user_id, $roles_id){
+    public function update_roles_by_user($user_id, $roles_id, $database_id){
         /**
-         * CHECK ID USER
+         * CHECK ID
          */
         if($user_id === null || $user_id === '' || $user_id === false){
             return response()->json([
                 'status' => false,
                 'errorTitle' => 'El id del usuario es requerido'
+            ], 400);
+        }
+
+        /**
+         * CHECK DATABASE ID
+         */
+        if($database_id === null || $database_id === '' || $database_id === false){
+            return response()->json([
+                'status' => false,
+                'errorTitle' => 'El id de la base de datos a seleccionar es requerido'
             ], 400);
         }
 
@@ -169,38 +267,61 @@ class managerService {
         }
 
         /**
-         * FIND USER
+         * GET DATABASE MODEL
          */
-        $user = rm_user::on('risk_matrix')->find($user_id);
+        $model = users_databases::where('id', $database_id)->get('model')->first();
 
         /**
-         * CHECK USER
+         * CHECK IF DATABASE EXISTS
          */
-        if(!$user){
+        if(empty($model)){
             return response()->json([
                 'status' => false,
-                'errorTitle' => 'Usuario no encontrado'
+                'errorTitle' => 'Base de datos no encontrada'
             ], 400);
         }
 
-        /**
-         * CHECK ROLES
-         */
-        foreach ($roles_id as $key => $value) {
-            $role = $user->get_role($value);
+        switch ($model->model) {
+            case 'rm_userModel':
+                /**
+                 * FIND USER
+                 */
+                $user = rm_user::on('risk_matrix')->find($user_id);
 
-            if(!$role){
-                return response()->json([
-                    'status' => false,
-                    'errorTitle' => 'Uno o más roles no se encontraron'
-                ], 400);
-            }
+                /**
+                 * CHECK USER
+                 */
+                if(!$user){
+                    return response()->json([
+                        'status' => false,
+                        'errorTitle' => 'Usuario no encontrado'
+                    ], 400);
+                }
+
+                /**
+                 * CHECK ROLES
+                 */
+                foreach ($roles_id as $key => $value) {
+                    $role = $user->get_role($value);
+
+                    if(!$role){
+                        return response()->json([
+                            'status' => false,
+                            'errorTitle' => 'Uno o más roles no se encontraron'
+                        ], 400);
+                    }
+                }
+
+                /**
+                 * CHANGE ROLES BY USER
+                 */
+                $user->update_roles_by_user($user->id, $roles_id);
+            break;
+
+            default:
+                # code...
+            break;
         }
-
-        /**
-         * CHANGE ROLES BY USER
-         */
-        $user->update_roles_by_user($user->id, $roles_id);
 
         /**
          * RETURN RESPONSE
@@ -214,11 +335,11 @@ class managerService {
     /**
      * DISABLE / ENABLE USER
      */
-    public function update_user_status($id){
+    public function update_user_status($user_id, $database_id){
         /**
          * CHECK ID
          */
-        if($id === null || $id === '' || $id === false){
+        if($user_id === null || $user_id === '' || $user_id === false){
             return response()->json([
                 'status' => false,
                 'errorTitle' => 'El id del usuario es requerido'
@@ -226,24 +347,57 @@ class managerService {
         }
 
         /**
-         * FIND USER
+         * CHECK DATABASE ID
          */
-        $user = rm_user::on('risk_matrix')->find($id);
-
-        /**
-         * CHECK USER
-         */
-        if(!$user){
+        if($database_id === null || $database_id === '' || $database_id === false){
             return response()->json([
                 'status' => false,
-                'errorTitle' => 'Usuario no encontrado'
+                'errorTitle' => 'El id de la base de datos a seleccionar es requerido'
             ], 400);
         }
 
         /**
-         * ENABLE OR DISABLE USER
+         * GET DATABASE MODEL
          */
-        $user->update_user_status($user->id);
+        $model = users_databases::where('id', $database_id)->get('model')->first();
+
+        /**
+         * CHECK IF DATABASE EXISTS
+         */
+        if(empty($model)){
+            return response()->json([
+                'status' => false,
+                'errorTitle' => 'Base de datos no encontrada'
+            ], 400);
+        }
+
+        switch ($model->model) {
+            case 'rm_userModel':
+                /**
+                 * FIND USER
+                 */
+                $user = rm_user::on('risk_matrix')->find($user_id);
+
+                /**
+                 * CHECK USER
+                 */
+                if(!$user){
+                    return response()->json([
+                        'status' => false,
+                        'errorTitle' => 'Usuario no encontrado'
+                    ], 400);
+                }
+
+                /**
+                 * ENABLE OR DISABLE USER
+                 */
+                $user->update_user_status($user->id);
+            break;
+
+            default:
+                # code...
+            break;
+        }
 
         /**
          * RETURN RESPONSE
@@ -257,11 +411,44 @@ class managerService {
     /**
      * GET ALL ROLES
      */
-    public function get_all_roles(){
+    public function get_all_roles($database_id){
         /**
-         * GET DATA
+         * CHECK DATABASE ID
          */
-        $roles = (new rm_user)->get_all_roles();
+        if($database_id === null || $database_id === '' || $database_id === false){
+            return response()->json([
+                'status' => false,
+                'errorTitle' => 'El id de la base de datos a seleccionar es requerido'
+            ], 400);
+        }
+
+        /**
+         * GET DATABASE MODEL
+         */
+        $model = users_databases::where('id', $database_id)->get('model')->first();
+
+        /**
+         * CHECK IF DATABASE EXISTS
+         */
+        if(empty($model)){
+            return response()->json([
+                'status' => false,
+                'errorTitle' => 'Base de datos no encontrada'
+            ], 400);
+        }
+
+        switch ($model->model) {
+            case 'rm_userModel':
+                /**
+                 * GET DATA
+                 */
+                $roles = (new rm_user)->get_all_roles();
+            break;
+
+            default:
+                # code...
+            break;
+        }
 
         /**
          * RETURN RESPONSE
@@ -276,11 +463,44 @@ class managerService {
     /**
      * GET ALL PERMISSIONS
      */
-    public function get_all_permissions(){
+    public function get_all_permissions($database_id){
         /**
-         * GET DATA
+         * CHECK DATABASE ID
          */
-        $permissions = (new rm_user)->get_all_permissions();
+        if($database_id === null || $database_id === '' || $database_id === false){
+            return response()->json([
+                'status' => false,
+                'errorTitle' => 'El id de la base de datos a seleccionar es requerido'
+            ], 400);
+        }
+
+        /**
+         * GET DATABASE MODEL
+         */
+        $model = users_databases::where('id', $database_id)->get('model')->first();
+
+        /**
+         * CHECK IF DATABASE EXISTS
+         */
+        if(empty($model)){
+            return response()->json([
+                'status' => false,
+                'errorTitle' => 'Base de datos no encontrada'
+            ], 400);
+        }
+
+        switch ($model->model) {
+            case 'rm_userModel':
+                /**
+                 * GET DATA
+                 */
+                $permissions = (new rm_user)->get_all_permissions();
+            break;
+
+            default:
+                # code...
+            break;
+        }
 
         /**
          * RETURN RESPONSE
