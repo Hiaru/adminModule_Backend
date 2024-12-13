@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+
 use Illuminate\Http\Request;
+
+// use Illuminate\Http\Request;
 
 /**
  * USE MANAGER SERVICE
@@ -35,6 +38,7 @@ class managerController extends Controller
     }
 
     public function get_roles_by_user(Request $request){
+
         /**
          * RETURN RESPONSE
          */
@@ -52,7 +56,7 @@ class managerController extends Controller
         /**
          * RETURN RESPONSE
          */
-        return $this->managerService->update_user_status($request->user_id, $request->database_id);
+        return $this->managerService->update_roles_by_user( $request->user_id, $request->roles_id, $request->database_id);
     }
 
     public function get_all_roles(Request $request){
@@ -63,7 +67,7 @@ class managerController extends Controller
     }
 
     public function get_all_permissions(Request $request){
-        /**
+      /**
          * RETURN RESPONSE
          */
         return $this->managerService->get_all_permissions($request->database_id);

@@ -29,4 +29,15 @@ class loginController extends Controller
     public function logout(){
         return $this->loginService->logout();
     }
+<<<<<<< HEAD
+=======
+
+    public function test(loginRequest $request){
+        return response()->json([
+            'status'        =>  true,
+            'message'       =>  'Usuario autenticado satisfactoriamente',
+            'data'          =>  'Chucha'
+        ], 201);
+    }
+>>>>>>> c14f9ebfc8c78c1815c1d3ac128417941633004b
 }

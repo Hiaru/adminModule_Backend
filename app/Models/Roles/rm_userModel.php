@@ -196,10 +196,13 @@ class rm_userModel extends Model
                 ->where('id', $user->id)
                 ->update(['accAuthorized' =>!$user->accAuthorized]);
 
+<<<<<<< HEAD
         /**
          * GET ACTUAL USER
          */
         $user = $this::on('risk_matrix')->find($id);
+=======
+>>>>>>> c14f9ebfc8c78c1815c1d3ac128417941633004b
     }
 
     /**
